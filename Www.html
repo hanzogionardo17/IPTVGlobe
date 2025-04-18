@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web IPTV Dinamis + Static & Sports Channels</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4ea1d3;
+      --primary-dark: #3a7ca5;
+      --secondary: #ff7e5f;
+      --dark: #121212;
+      --darker: #0a0a0a;
+      --light: #f5f5f5;
+      --gray: #444;
+      --light-gray: #888;
+      --sidebar-width: 280px;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: all 0.3s ease;
+    }
+    
+    body {
+      background: var(--dark);
+      color: var(--light);
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    
+    header, footer {
+      background: var(--darker);
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 10;
+    }
+    
+    header {
+      border-bottom: 1px solid var(--gray);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+      animation: fadeIn 1s ease;
+      margin: 0;
+    }
+    
+    .menu-btn {
+      background: none;
+      border: none;
+      color: var(--light);
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: none;
+    }
+    
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+    }
+    
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      animation: slideUp 0.8s ease;
+    }
+    
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      position: relative;
+    }
+    
+    label {
+      font-size: 0.9rem;
+      color: var(--light-gray);
+      text-align: left;
+    }
+    
+    input, select, button {
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      border: 2px solid var(--gray);
+      background: var(--darker);
+      color: var(--light);
+      font-family: inherit;
+      font-size: 1rem;
+      outline: none;
+      width: 100%;
+    }
+    
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(78, 161, 211, 0.2);
+    }
+    
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button#loadBtn {
+      background: var(--secondary);
+    }
+    
+    button#loadBtn:hover {
+      background: #e66a4a;
+    }
+    
+    video {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      background: black;
+      aspect-ratio: 16/9;
+      margin-top: 1rem;
+      animation: fadeIn 1s ease;
+    }
+    
+    footer {
+      text-align: center;
+      border-top: 1px solid var(--gray);
+    }
+    
+    footer p {
+      font-size: 0.9rem;
+      color: var(--light-gray);
+    }
+    
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      position: relative;
+    }
+    
+    footer a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+    
+    footer a:hover::after {
+      width: 100%;
+    }
+    
+    .heart {
+      color: #ff4d4d;
+      display: inline-block;
+      animation: pulse 1.5s infinite;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: var(--sidebar-width);
+      height: 100%;
+      background: var(--darker);
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+      z-index: 100;
+      padding: 1.5rem;
+      overflow-y: auto;
+      transition: right 0.3s ease;
+    }
+    
+    .sidebar.show {
+      right: 0;
+    }
+    
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--gray);
+    }
+    
+    .sidebar-title {
+      font-size: 1.3rem;
+      color: var(--primary);
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--light);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    .sidebar-section {
+      margin-bottom: 1.5rem;
+    }
+    
+    .sidebar-section h3 {
+      color: var(--secondary);
+      margin-bottom: 0.8rem;
+      font-size: 1.1rem;
+    }
+    
+    .sidebar-section p {
+      color: var(--light-gray);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary);
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+    }
+    
+    .contact-link:hover {
+      text-decoration: underline;
+    }
+    
+    /* Search box */
+    .search-container {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+    
+    .search-container i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--light-gray);
+    }
+    
+    #countrySearch {
+      padding-left: 40px;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Responsive */
+    @media (min-width: 768px) {
+      .input-group {
+        flex-direction: row;
+      }
+      
+      .input-group select, 
+      .input-group input {
+        flex: 1;
+      }
+      
+      .input-group button {
+        width: auto;
+        min-width: 150px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .menu-btn {
+        display: block;
+      }
+      
+      .sidebar {
+        width: 100%;
+      }
+    }
+    
+    /* Loading spinner */
+    .spinner {
+      display: none;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    /* Channel list styling */
+    #channelList {
+      height: 42px;
+      overflow: hidden;
+    }
+    
+    #channelList:focus {
+      height: auto;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    #channelList optgroup {
+      color: var(--primary);
+      font-weight: 500;
+    }
+    
+    #channelList option {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--gray);
+    }
+    
+    #channelList option:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background: var(--darker);
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+      animation: modalFadeIn 0.3s ease;
+    }
+    
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+    
+    .modal-text {
+      margin-bottom: 1.5rem;
+      color: var(--light-gray);
+    }
+    
+    .modal-btn {
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .modal-btn:hover {
+      background: var(--primary-dark);
+    }
+    
+    /* Fullscreen button */
+    .fullscreen-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+    }
+    
+    .fullscreen-btn:hover {
+      background: rgba(0, 0, 0, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌐 Web IPTV Dinamis + Static & Sports Channels</h1>
+    <button class="menu-btn" id="menuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="input-group">
+        <div class="search-container">
+          <i class="fas fa-search"></i>
+          <input id="countrySearch" type="text" placeholder="Cari negara...">
+        </div>
+        <select id="countrySelect">
+          <option value="">-- Pilih Negara Default --</option>
+          <option value="https://iptv-org.github.io/iptv/countries/id.m3u">🇮🇩 Indonesia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/us.m3u">🇺🇸 Amerika Serikat</option>
+          <option value="https://iptv-org.github.io/iptv/countries/gb.m3u">🇬🇧 Inggris</option>
+          <option value="https://iptv-org.github.io/iptv/countries/de.m3u">🇩🇪 Jerman</option>
+          <option value="https://iptv-org.github.io/iptv/countries/fr.m3u">🇫🇷 Perancis</option>
+          <option value="https://iptv-org.github.io/iptv/countries/jp.m3u">🇯🇵 Jepang</option>
+          <option value="https://iptv-org.github.io/iptv/countries/au.m3u">🇦🇺 Australia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/in.m3u">🇮🇳 India</option>
+          <option value="https://iptv-org.github.io/iptv/countries/my.m3u">🇲🇾 Malaysia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/sg.m3u">🇸🇬 Singapura</option>
+          <option value="https://iptv-org.github.io/iptv/countries/th.m3u">🇹🇭 Thailand</option>
+          <option value="https://iptv-org.github.io/iptv/countries/vn.m3u">🇻🇳 Vietnam</option>
+          <option value="https://iptv-org.github.io/iptv/countries/kr.m3u">🇰🇷 Korea Selatan</option>
+          <option value="https://iptv-org.github.io/iptv/countries/cn.m3u">🇨🇳 Tiongkok (China)</option>
+          <option value="https://iptv-org.github.io/iptv/countries/sa.m3u">🇸🇦 Arab Saudi</option>
+          <option value="https://iptv-org.github.io/iptv/countries/it.m3u">🇮🇹 Italia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/es.m3u">🇪🇸 Spanyol</option>
+          <option value="https://iptv-org.github.io/iptv/countries/nl.m3u">🇳🇱 Belanda</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ru.m3u">🇷🇺 Rusia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/za.m3u">🇿🇦 Afrika selatan</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ng.m3u">🇳🇬 Nigeria</option>
+          <option value="https://iptv-org.github.io/iptv/countries/eg.m3u">🇪🇬 Mesir</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ke.m3u">🇰🇪 Kenya</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ca.m3u">🇨🇦 Kanada</option>
+          <option value="https://iptv-org.github.io/iptv/countries/br.m3u">🇧🇷 Brazil</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mx.m3u">🇲🇽 Mexico</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ar.m3u">🇦🇷 Argentina</option>
+          <option value="https://iptv-org.github.io/iptv/countries/nz.m3u">🇳🇿 Selandia baru</option>
+          <option value="https://iptv-org.github.io/iptv/countries/fj.m3u">🇫🇯 Fiji</option>
+          <option value="https://iptv-org.github.io/iptv/countries/pg.m3u">🇵🇬 Papua Nugini</option>
+          <option value="https://iptv-org.github.io/iptv/countries/pe.m3u">🇵🇪 Peru</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ve.m3u">🇻🇪 Venezuela</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mm.m3u">🇲🇲 Myanmar</option>
+          <option value="https://iptv-org.github.io/iptv/countries/lk.m3u">🇱🇰 Sri Lanka</option>
+          <option value="https://iptv-org.github.io/iptv/countries/np.m3u">🇳🇵 Nepal</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ir.m3u">🇮🇷 Iran</option>
+          <option value="https://iptv-org.github.io/iptv/countries/il.m3u">🇮🇱 Israel</option>
+          <option value="https://iptv-org.github.io/iptv/countries/qa.m3u">🇶🇦 Qatar</option>
+          <option value="https://iptv-org.github.io/iptv/countries/et.m3u">🇪🇹 Etiopia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/zm.m3u">🇿🇲 Zambia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/tz.m3u">🇹🇿 Tanzania</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ug.m3u">🇺🇬 Uganda</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ae.m3u">🇦🇪 Uni Emirat Arab</option>
+          <option value="https://iptv-org.github.io/iptv/countries/pk.m3u">🇵🇰 Pakistan</option>
+          <option value="https://iptv-org.github.io/iptv/countries/tr.m3u">🇹🇷 Turki</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ro.m3u">🇷🇴 Rumania</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ua.m3u">🇺🇦 Ukraina</option>
+          <option value="https://iptv-org.github.io/iptv/countries/kz.m3u">🇰🇿 Kazakhstan</option>
+          <option value="https://iptv-org.github.io/iptv/countries/uz.m3u">🇺🇿 Uzbekistan</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ge.m3u">🇬🇪 Georgia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/lb.m3u">🇱🇧 Lebanon</option>
+          <option value="https://iptv-org.github.io/iptv/countries/jo.m3u">🇯🇴 Yordania</option>
+          <option value="https://iptv-org.github.io/iptv/countries/iq.m3u">🇮🇶 Irak</option>
+          <option value="https://iptv-org.github.io/iptv/countries/kw.m3u">🇰🇼 Kuwait</option>
+          <option value="https://iptv-org.github.io/iptv/countries/om.m3u">🇴🇲 Oman</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ly.m3u">🇱🇾 Libya</option>
+          <option value="https://iptv-org.github.io/iptv/countries/tn.m3u">🇹🇳 Tunisia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ma.m3u">🇲🇦 Maroko</option>
+          <option value="https://iptv-org.github.io/iptv/countries/sn.m3u">🇸🇳 Senegal</option>
+          <option value="https://iptv-org.github.io/iptv/countries/gh.m3u">🇬🇭 Ghana</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ci.m3u">🇨🇮 Pantai Gading</option>
+          <option value="https://iptv-org.github.io/iptv/countries/zw.m3u">🇿🇼 Zimbabwe</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mz.m3u">🇲🇿 Mozambik</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mw.m3u">🇲🇼 Malawi</option>
+          <option value="https://iptv-org.github.io/iptv/countries/rw.m3u">🇷🇼 Rwanda</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ss.m3u">🇸🇸 Sudan Selatan</option>
+          <option value="https://iptv-org.github.io/iptv/countries/sd.m3u">🇸🇩 Sudan</option>
+          <option value="https://iptv-org.github.io/iptv/countries/dj.m3u">🇩🇯 Djibouti</option>
+          <option value="https://iptv-org.github.io/iptv/countries/er.m3u">🇪🇷 Eritrea</option>
+          <option value="https://iptv-org.github.io/iptv/countries/so.m3u">🇸🇴 Somalia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mg.m3u">🇲🇬 Madagaskar</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mu.m3u">🇲🇺 Mauritius</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ls.m3u">🇱🇸 Lesotho</option>
+          <option value="https://iptv-org.github.io/iptv/countries/sz.m3u">🇸🇿 Eswatini</option>
+          <option value="https://iptv-org.github.io/iptv/countries/na.m3u">🇳🇦 Namibia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ec.m3u">🇪🇨 Ekuador</option>
+          <option value="https://iptv-org.github.io/iptv/countries/py.m3u">🇵🇾 Paraguay</option>
+          <option value="https://iptv-org.github.io/iptv/countries/uy.m3u">🇺🇾 Uruguay</option>
+          <option value="https://iptv-org.github.io/iptv/countries/gy.m3u">🇬🇾 Guyana</option>
+          <option value="https://iptv-org.github.io/iptv/countries/sr.m3u">🇸🇷 Suriname</option>
+          <option value="https://iptv-org.github.io/iptv/countries/tt.m3u">🇹🇹 Trinidad dan Tobago</option>
+          <option value="https://iptv-org.github.io/iptv/countries/jm.m3u">🇯🇲 Jamaika</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ht.m3u">🇭🇹 Haiti</option>
+          <option value="https://iptv-org.github.io/iptv/countries/do.m3u">🇩🇴 Republik Dominika</option>
+          <option value="https://iptv-org.github.io/iptv/countries/cu.m3u">🇨🇺 Kuba</option>
+          <option value="https://iptv-org.github.io/iptv/countries/pr.m3u">🇵🇷 Puerto Riko</option>
+          <option value="https://iptv-org.github.io/iptv/countries/gt.m3u">🇬🇹 Guatemala</option>
+          <option value="https://iptv-org.github.io/iptv/countries/sv.m3u">🇸🇻 El Salvador</option>
+          <option value="https://iptv-org.github.io/iptv/countries/hn.m3u">🇭🇳 Honduras</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ni.m3u">🇳🇮 Nikaragua</option>
+          <option value="https://iptv-org.github.io/iptv/countries/pa.m3u">🇵🇦 Panama</option>
+          <option value="https://iptv-org.github.io/iptv/countries/cw.m3u">🇨🇼 Curaçao</option>
+          <option value="https://iptv-org.github.io/iptv/countries/aw.m3u">🇦🇼 Aruba</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ai.m3u">🇦🇮 Anguilla</option>
+          <option value="https://iptv-org.github.io/iptv/countries/vc.m3u">🇻🇨 Saint Vincent dan Grenadines</option>
+          <option value="https://iptv-org.github.io/iptv/countries/lc.m3u">🇱🇨 Saint Lucia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/dm.m3u">🇩🇲 Dominika</option>
+          <option value="https://iptv-org.github.io/iptv/countries/kn.m3u">🇰🇳 Saint Kitts dan Nevis</option>
+          <option value="https://iptv-org.github.io/iptv/countries/gd.m3u">🇬🇩 Grenada</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ky.m3u">🇰🇾 Kepulauan Cayman</option>
+          <option value="https://iptv-org.github.io/iptv/countries/bm.m3u">🇧🇲 Bermuda</option>
+          <option value="https://iptv-org.github.io/iptv/countries/tc.m3u">🇹🇨 Kepulauan Turks dan Caicos</option>
+          <option value="https://iptv-org.github.io/iptv/countries/vg.m3u">🇻🇬 Kepulauan Virgin Inggris</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ms.m3u">🇲🇸 Montserrat</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mq.m3u">🇲🇶 Martinik</option>
+          <option value="https://iptv-org.github.io/iptv/countries/gp.m3u">🇬🇵 Guadeloupe</option>
+          <option value="https://iptv-org.github.io/iptv/countries/gf.m3u">🇬🇫 Guyana Prancis</option>
+          <option value="https://iptv-org.github.io/iptv/countries/re.m3u">🇷🇪 Réunion</option>
+          <option value="https://iptv-org.github.io/iptv/countries/yt.m3u">🇾🇹 Mayotte</option>
+          <option value="https://iptv-org.github.io/iptv/countries/pf.m3u">🇵🇫 Polinesia Prancis</option>
+          <option value="https://iptv-org.github.io/iptv/countries/nc.m3u">🇳🇨 Kaledonia Baru</option>
+          <option value="https://iptv-org.github.io/iptv/countries/wf.m3u">🇼🇫 Wallis dan Futuna</option>
+          <option value="https://iptv-org.github.io/iptv/countries/as.m3u">🇦🇸 Samoa Amerika</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ws.m3u">🇼🇸 Samoa</option>
+          <option value="https://iptv-org.github.io/iptv/countries/to.m3u">🇹🇴 Tonga</option>
+          <option value="https://iptv-org.github.io/iptv/countries/fm.m3u">🇫🇲 Mikronesia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mh.m3u">🇲🇭 Kepulauan Marshall</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ki.m3u">🇰🇮 Kiribati</option>
+          <option value="https://iptv-org.github.io/iptv/countries/tv.m3u">🇹🇻 Tuvalu</option>
+          <option value="https://iptv-org.github.io/iptv/countries/nr.m3u">🇳🇷 Nauru</option>
+          <option value="https://iptv-org.github.io/iptv/countries/pw.m3u">🇵🇼 Palau</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ck.m3u">🇨🇰 Kepulauan Cook</option>
+          <option value="https://iptv-org.github.io/iptv/countries/sb.m3u">🇸🇧 Kepulauan Solomon</option>
+          <option value="https://iptv-org.github.io/iptv/countries/vu.m3u">🇻🇺 Vanuatu</option>
+          <option value="https://iptv-org.github.io/iptv/countries/gu.m3u">🇬🇺 Guam</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mp.m3u">🇲🇵 Kepulauan Mariana Utara</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mv.m3u">🇲🇻 Maladewa</option>
+          <option value="https://iptv-org.github.io/iptv/countries/sc.m3u">🇸🇨 Seychelles</option>
+          <option value="https://iptv-org.github.io/iptv/countries/km.m3u">🇰🇲 Komoro</option>
+          <option value="https://iptv-org.github.io/iptv/countries/tl.m3u">🇹🇱 Timor Leste</option>
+          <option value="https://iptv-org.github.io/iptv/countries/la.m3u">🇱🇦 Laos</option>
+          <option value="https://iptv-org.github.io/iptv/countries/kg.m3u">🇰🇬 Kirgizstan</option>
+          <option value="https://iptv-org.github.io/iptv/countries/tj.m3u">🇹🇯 Tajikistan</option>
+          <option value="https://iptv-org.github.io/iptv/countries/tm.m3u">🇹🇲 Turkmenistan</option>
+          <option value="https://iptv-org.github.io/iptv/countries/md.m3u">🇲🇩 Moldova</option>
+          <option value="https://iptv-org.github.io/iptv/countries/am.m3u">🇦🇲 Armenia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/bg.m3u">🇧🇬 Bulgaria</option>
+          <option value="https://iptv-org.github.io/iptv/countries/rs.m3u">🇷🇸 Serbia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/me.m3u">🇲🇪 Montenegro</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mk.m3u">🇲🇰 Makedonia Utara</option>
+          <option value="https://iptv-org.github.io/iptv/countries/si.m3u">🇸🇮 Slovenia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ee.m3u">🇪🇪 Estonia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/lv.m3u">🇱🇻 Latvia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/lt.m3u">🇱🇹 Lituania</option>
+          <option value="https://iptv-org.github.io/iptv/countries/is.m3u">🇮🇸 Islandia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ie.m3u">🇮🇪 Irlandia</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mt.m3u">🇲🇹 Malta</option>
+          <option value="https://iptv-org.github.io/iptv/countries/lu.m3u">🇱🇺 Luksemburg</option>
+          <option value="https://iptv-org.github.io/iptv/countries/mc.m3u">🇲🇨 Monako</option>
+          <option value="https://iptv-org.github.io/iptv/countries/li.m3u">🇱🇮 Liechtenstein</option>
+          <option value="https://iptv-org.github.io/iptv/countries/sm.m3u">🇸🇲 San Marino</option>
+          <option value="https://iptv-org.github.io/iptv/countries/va.m3u">🇻🇦 Vatikan</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ad.m3u">🇦🇩 Andorra</option>
+          <option value="https://iptv-org.github.io/iptv/countries/gl.m3u">🇬🇱 Greenland</option>
+          <option value="https://iptv-org.github.io/iptv/countries/fo.m3u">🇫🇴 Kepulauan Faroe</option>
+          <option value="https://iptv-org.github.io/iptv/countries/gi.m3u">🇬🇮 Gibraltar</option>
+          <option value="https://iptv-org.github.io/iptv/countries/im.m3u">🇮🇲 Isle of Man</option>
+          <option value="https://iptv-org.github.io/iptv/countries/je.m3u">🇯🇪 Jersey</option>
+          <option value="https://iptv-org.github.io/iptv/countries/gg.m3u">🇬🇬 Guernsey</option>
+          <option value="https://iptv-org.github.io/iptv/countries/ax.m3u">🇦🇽 Kepulauan Åland</option>
+          <option value="https://iptv-org.github.io/iptv/countries/sj.m3u">🇸🇯 Svalbard dan Jan Mayen</option>
+          <option value="https://iptv-org.github.io/iptv/countries/bv.m3u">🇧🇻 Pulau Bouvet</option>
+          <option value="https://iptv-org.github.io/iptv/countries/tf.m3u">🇹🇫 Daratan Selatan dan Antarktika Prancis</option>
+          <option value="https://iptv-org.github.io/iptv/countries/hm.m3u">🇭🇲 Pulau Heard dan Kepulauan McDonald</option>
+          <option value="https://iptv-org.github.io/iptv/countries/aq.m3u">🇦🇶 Antarktika</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <input id="urlInput" type="text" placeholder="Masukkan URL .m3u (opsional)">
+        <button id="loadBtn">
+          <span class="spinner" id="loadSpinner"></span>
+          <span id="loadText">Load Playlist</span>
+        </button>
+      </div>
+
+      <div class="input-group">
+        <label for="channelList">Pilih Channel:</label>
+        <select id="channelList" disabled>
+          <option>-- Pilih channel setelah memuat playlist --</option>
+        </select>
+      </div>
+
+      <div style="position: relative;">
+        <video id="player" controls autoplay></video>
+        <button class="fullscreen-btn" id="fullscreenBtn" title="Fullscreen">
+          <i class="fas fa-expand"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2 class="sidebar-title">Tentang Web IPTV</h2>
+      <button class="close-btn" id="closeBtn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>Deskripsi</h3>
+      <p>Web IPTV ini memungkinkan Anda menonton channel TV dari berbagai negara secara online. Anda dapat memilih playlist negara default atau memasukkan URL playlist custom.</p>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>Fitur</h3>
+      <p>• Channel TV dari berbagai negara</p>
+      <p>• Channel static Indonesia</p>
+      <p>• Channel olahraga internasional</p>
+      <p>• Pencarian negara yang mudah</p>
+      <p>• Tampilan responsif</p>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>Kontak Pembuat</h3>
+      <a href="mailto:hanzogionardo@gmail.com" class="contact-link">
+        <i class="fas fa-envelope"></i> hanzogionardo@gmail.com
+      </a>
+      <a href="https://instagram.com/ab.iqqq" target="_blank" class="contact-link">
+        <i class="fab fa-instagram"></i> @ab.iqqq
+      </a>
+    </div>
+  </div>
+
+  <!-- Modal Fullscreen Suggestion -->
+  <div class="modal" id="fullscreenModal">
+    <div class="modal-content">
+      <h3 class="modal-title">Pengalaman Menonton Lebih Baik</h3>
+      <p class="modal-text">Untuk pengalaman menonton yang lebih baik, silahkan gunakan mode fullscreen dengan mengklik tombol expand di pojok kanan bawah player.</p>
+      <button class="modal-btn" id="modalOkBtn">Oke, Mengerti</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 Web IPTV Dinamis • Dibuat oleh <span class="heart">❤️</span> <a id="devLink">@ab.iqqq</a></p>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- HLS.js dari CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script>
+    // Toast notification function
+    function showToast(message, duration = 3000) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
+    }
+
+    // Check if fullscreen suggestion was shown before
+    if (!localStorage.getItem('fullscreenSuggestionShown')) {
+      setTimeout(() => {
+        document.getElementById('fullscreenModal').style.display = 'flex';
+        localStorage.setItem('fullscreenSuggestionShown', 'true');
+      }, 3000);
+    }
+
+    // Modal close button
+    document.getElementById('modalOkBtn').addEventListener('click', () => {
+      document.getElementById('fullscreenModal').style.display = 'none';
+    });
+
+    // Sidebar toggle
+    document.getElementById('menuBtn').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.add('show');
+    });
+
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.remove('show');
+    });
+
+    // Close sidebar when clicking outside
+    document.addEventListener('click', (e) => {
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar.classList.contains('show') && !sidebar.contains(e.target) && e.target !== document.getElementById('menuBtn')) {
+        sidebar.classList.remove('show');
+      }
+    });
+
+    // Fullscreen button
+    document.getElementById('fullscreenBtn').addEventListener('click', () => {
+      const player = document.getElementById('player');
+      if (player.requestFullscreen) {
+        player.requestFullscreen();
+      } else if (player.webkitRequestFullscreen) {
+        player.webkitRequestFullscreen();
+      } else if (player.msRequestFullscreen) {
+        player.msRequestFullscreen();
+      }
+    });
+
+    // Popup peringatan saat halaman selesai load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        showToast('Tips: Jika streaming tidak bisa diputar, coba ganti channel lain.');
+      }, 1000);
+    });
+
+    // Popup dukung pengembang saat klik nama developer
+    document.getElementById('devLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showToast('Dukung pengembang dengan follow Instagram @ab.iqqq', 4000);
+    });
+
+    const countrySelect = document.getElementById('countrySelect');
+    const countrySearch = document.getElementById('countrySearch');
+    const urlInput      = document.getElementById('urlInput');
+    const loadBtn       = document.getElementById('loadBtn');
+    const loadText      = document.getElementById('loadText');
+    const loadSpinner   = document.getElementById('loadSpinner');
+    const channelList   = document.getElementById('channelList');
+    const player        = document.getElementById('player');
+    let hls;
+
+    // Static Channels (Indonesia)
+    const staticChannels = [
+      { title: '📺 SCTV',     file: 'http://edge.nim.mivo.tv/kqcsmbqna6yg/sctv2_all/playlist.m3u8' },
+      { title: '📺 Indosiar', file: 'http://edge.nim.mivo.tv/kqcsmbqna6yg/indosiar2_all/playlist.m3u8' },
+      { title: '📺 RCTI',     file: 'http://edge.nim.mivo.tv/kqcsmbqna6yg/rcti2_all/playlist.m3u8' },
+      { title: '📺 MNC TV',   file: 'http://edge.nim.mivo.tv/kqcsmbqna6yg/mnctv2_all/playlist.m3u8' },
+      { title: '📺 Kompas TV',file: 'http://edge.nim.mivo.tv/kqcsmbqna6yg/kompastv_all/playlist.m3u8' },
+      { title: '📺 Metro TV', file: 'http://edge.nim.mivo.tv/kqcsmbqna6yg/metrotv2_all/playlist.m3u8' },
+      { title: '📺 tvOne',    file: 'http://edge.nim.mivo.tv/kqcsmbqna6yg/tvone2_all/playlist.m3u8' },
+      { title: '📺 ANTV',     file: 'http://edge.nim.mivo.tv/kqcsmbqna6yg/antv2_all/playlist.m3u8' },
+      { title: '📺 Net TV',   file: 'http://edge.nim.mivo.tv/kqcsmbqna6yg/nettv_all/playlist.m3u8' },
+      { title: '📺 iNews TV', file: 'https://fta.rctiplus.id/live/eds/INEWS_2021/live_fta/INEWS_2021-avc1_800000=8-mp4a_96000=2.m3u8' }
+    ];
+
+    // Sports Channels
+    const sportsChannels = [
+      { title: '⚽ beIN Sports 1',     file: 'http://premium-play.org:8000/saidclt201/XmQat4ju/2826' },
+      { title: '🏆 Ten Sports PK',      file: 'http://121.91.61.106:8000/play/a04h/index.m3u8' },
+      { title: '⚽ CBS Sports Golazo',  file: 'https://dai.google.com/linear/hls/event/GxrCGmwST0ixsrc_QgB6qw/master.m3u8' },
+      { title: '🏏 PTV Sports',         file: 'http://121.91.61.106:8000/play/a00l/index.m3u8' },
+      { title: '🏅 TDM Sports',         file: 'https://live3.tdm.com.mo/ch4/sport_ch4.live/playlist.m3u8' }
+    ];
+
+    // Search functionality
+    countrySearch.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const options = countrySelect.options;
+      
+      for (let i = 0; i < options.length; i++) {
+        const option = options[i];
+        if (option.text.toLowerCase().includes(searchTerm)) {
+          option.style.display = '';
+        } else {
+          option.style.display = 'none';
+        }
+      }
+      
+      // Show the select dropdown when searching
+      if (searchTerm.length > 0) {
+        countrySelect.size = Math.min(10, countrySelect.options.length);
+        countrySelect.style.height = 'auto';
+      } else {
+        countrySelect.size = 1;
+        countrySelect.style.height = '';
+      }
+    });
+
+    // Parser M3U sederhana
+    function parseM3U(txt) {
+      return txt.split('\n').map(l => l.trim()).reduce((arr, line, i, lines) => {
+        if (line.startsWith('#EXTINF')) {
+          const title = line.split(',')[1] || 'No title';
+          const file  = lines[i+1] || '';
+          arr.push({ title, file });
+        }
+        return arr;
+      }, []);
+    }
+
+    // Muat & parse playlist dari URL
+    function loadPlaylist(url) {
+      // Show loading state
+      loadText.textContent = 'Memuat...';
+      loadSpinner.style.display = 'block';
+      loadBtn.disabled = true;
+      
+      fetch(url)
+        .then(r => {
+          if (!r.ok) throw new Error('Gagal memuat playlist');
+          return r.text();
+        })
+        .then(txt => {
+          const dynamic = parseM3U(txt);
+          channelList.innerHTML = '';
+
+          // Static
+          const optStatic = document.createElement('optgroup');
+          optStatic.label = '📺 Static Channels';
+          staticChannels.forEach(ch => {
+            const o = document.createElement('option');
+            o.value = ch.file; o.text = ch.title;
+            optStatic.appendChild(o);
+          });
+          channelList.appendChild(optStatic);
+
+          // Sports
+          const optSport = document.createElement('optgroup');
+          optSport.label = '⚽ Sports Channels';
+          sportsChannels.forEach(ch => {
+            const o = document.createElement('option');
+            o.value = ch.file; o.text = ch.title;
+            optSport.appendChild(o);
+          });
+          channelList.appendChild(optSport);
+
+          // Dynamic
+          const optDyn = document.createElement('optgroup');
+          optDyn.label = '🌐 Playlist Channels';
+          dynamic.forEach(ch => {
+            const o = document.createElement('option');
+            o.value = ch.file; o.text = ch.title;
+            optDyn.appendChild(o);
+          });
+          channelList.appendChild(optDyn);
+
+          channelList.disabled = false;
+          showToast('Playlist berhasil dimuat!');
+          
+          // Auto scroll to player
+          setTimeout(() => {
+            player.scrollIntoView({ behavior: 'smooth' });
+          }, 500);
+        })
+        .catch(e => {
+          showToast('Error: ' + e.message, 5000);
+          console.error(e);
+        })
+        .finally(() => {
+          // Reset loading state
+          loadText.textContent = 'Load Playlist';
+          loadSpinner.style.display = 'none';
+          loadBtn.disabled = false;
+        });
+    }
+
+    // Event listeners
+    loadBtn.addEventListener('click', () => {
+      const url = urlInput.value.trim();
+      if (url) {
+        loadPlaylist(url);
+      } else {
+        showToast('Masukkan URL playlist terlebih dahulu', 3000);
+      }
+    });
+    
+    countrySelect.addEventListener('change', () => {
+      const url = countrySelect.value;
+      if (url) {
+        urlInput.value = url;
+        loadPlaylist(url);
+      }
+    });
+
+    // Play saat pilih channel
+    channelList.addEventListener('change', () => {
+      const src = channelList.value;
+      if (!src) return;
+      
+      showToast('Memulai streaming...');
+      
+      if (hls) { 
+        hls.destroy(); 
+        hls = null; 
+      }
+      
+      if (Hls.isSupported()) {
+        hls = new Hls({
+          maxBufferLength: 30,
+          maxMaxBufferLength: 600,
+          maxBufferSize: 60*1000*1000,
+          maxBufferHole: 5.0
+        });
+        
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          if (data.fatal) {
+            switch(data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                showToast('Error jaringan, coba channel lain', 4000);
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                showToast('Error media, coba channel lain', 4000);
+                break;
+              default:
+                showToast('Error streaming, coba channel lain', 4000);
+                break;
+            }
+          }
+        });
+        
+        hls.loadSource(src);
+        hls.attachMedia(player);
+      } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+        player.src = src;
+      } else {
+        showToast('Browser tidak mendukung HLS.', 4000);
+      }
+      
+      player.play().catch(e => {
+        showToast('Autoplay diblokir, klik play manual', 4000);
+      });
+    });
+    
+    // Add keyboard shortcut (Enter to load playlist)
+    urlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        loadBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
